@@ -29,7 +29,22 @@ class Deck {
     }
     return cards;
   }
+
+  public shuffleDeck(): void {
+    let deckSize: number = this.cards.length; // 48
+
+    for (let i = deckSize - 1; i >= 0; i--) {
+      let randomNum = Math.floor(Math.random() * (i + 1));
+
+      let temp = this.cards[i];
+      this.cards[i] = this.cards[randomNum];
+      this.cards[randomNum] = temp;
+    }
+  }
 }
 
 const deck = new Deck();
+console.log(deck);
+
+deck.shuffleDeck();
 console.log(deck);
