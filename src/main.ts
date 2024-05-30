@@ -43,8 +43,35 @@ class Deck {
   }
 }
 
+let cont = document.getElementById('container');
 const deck = new Deck();
 console.log(deck);
 
-deck.shuffleDeck();
-console.log(deck);
+let fArr = [];
+for (let i = 0; i < 5; i++) {
+  fArr.push(deck.cards[i]);
+}
+console.log(fArr);
+
+for (let i = 0; i < 5; i++) {
+  let html = '';
+  html = `
+  <p id="tag${i}" class="${i}" value="${i}">${deck.cards[i].rank}:${deck.cards[i].suit}</p>
+  `;
+
+  cont!.innerHTML += html;
+}
+
+for (let i = 0; i < 5; i++) {
+  let p = <HTMLElement>document.querySelector(`#tag${i}`)!;
+
+  p!.addEventListener('click', () => {
+    // console.log(`${deck.cards[i].rank}`);
+
+    console.log(p);
+
+    if (p.id === 'tag0') {
+      p!.style.color = 'red';
+    }
+  });
+}
