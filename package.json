@@ -19,6 +19,12 @@
     "typescript": "^5.4.5",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.0.4"
+    "webpack-dev-server": "^5.0.4",
+    "@types/createjs": "^0.0.32",
+    "@types/node": "^20.12.8",
+    "animatecc-dts": "^0.3.2",
+    "createjs-def": "^0.3.0",
+    "extendscript-es5-shim-ts": "~0.0.1",
+    "types-for-adobe": "^7.2.0"
   }
 }
