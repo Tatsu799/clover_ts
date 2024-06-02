@@ -2,11 +2,13 @@ export class Card {
   public suit: string;
   public rank: string;
   public index: number;
+  public currentPos: number;
 
-  constructor(suit: string, rank: string, index: number) {
+  constructor(suit: string, rank: string, index: number, currentPos: number) {
     this.suit = suit;
     this.rank = rank;
     this.index = index;
+    this.currentPos = currentPos;
   }
 }
 
@@ -17,19 +19,17 @@ export class Deck {
   public cards: Card[] = [];
 
   constructor() {
-    // this.cards = Deck.createDeck();
     this.cards = this.createDeck();
-    this.shuffleDeck();
+    // this.shuffleDeck();
   }
 
   public createDeck(): Card[] {
     const suitsLen = Deck._SUITS.length; //4
     const rankLen = Deck._RANKS.length; //12
-    // const cards: Card[] = [];
 
     for (let i = 0; i < suitsLen; i++) {
       for (let j = 0; j < rankLen; j++) {
-        this.cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j));
+        this.cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j, 0));
       }
     }
     return this.cards;
