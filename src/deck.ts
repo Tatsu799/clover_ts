@@ -2,7 +2,7 @@ export class Card {
   public suit: string;
   public rank: string;
   public index: number;
-  public currentPos: number;
+  public currentPos: number; //
 
   constructor(suit: string, rank: string, index: number, currentPos: number) {
     this.suit = suit;
@@ -20,7 +20,7 @@ export class Deck {
 
   constructor() {
     this.cards = this.createDeck();
-    // this.shuffleDeck();
+    this.shuffleDeck();
   }
 
   public createDeck(): Card[] {

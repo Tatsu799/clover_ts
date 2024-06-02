@@ -7,6 +7,8 @@ export class GameField {
   public fieldCards: Card[] = []; //フィールドにあるカードを管理
   public setTimeId: number = 0;
 
+  public fCards: createjs.Text[] = [];
+
   public static stage = new createjs.Stage('canvas');
   constructor() {
     window.addEventListener('load', () => {
@@ -36,7 +38,7 @@ export class GameField {
     // GameField.stage.update();
   }
 
-  public getOpenCards() {
+  public getFirstFieldCards() {
     for (let i = 0; i < 16; i++) {
       this.fieldCards.push(this.deck.cards[i]);
     }
@@ -47,8 +49,9 @@ export class GameField {
   // }
 
   public lineUpCards() {
-    this.getOpenCards();
+    this.getFirstFieldCards();
 
+    //ここはAnnimateの画像入れ替え
     let deck = new createjs.Text('DECK', '20px serif');
     GameField.stage.addChild(deck);
     deck.x = 380;
@@ -66,8 +69,7 @@ export class GameField {
       for (let i = 0; i < this.fieldCards.length; i++) {
         await sleep(100);
         //ここはAnimateの画像に変える
-        let card = new createjs.Text(`${this.fieldCards[i].suit}:${this.fieldCards[i].rank}`, '20px serif');
-
+        let card = new createjs.Text(`${this.fieldCards[i].suit}:${this.fieldCards[i].rank}`, '20px serif'); //
         GameField.stage.addChild(card);
         card.x = 380;
         card.y = 380;
@@ -76,14 +78,20 @@ export class GameField {
         this.fieldCards[i].currentPos = this.cardsPos.position[i].pos;
         this.deck.cards.shift();
 
-        card.addEventListener('click', () => {
+        this.fCards.push(card);
+
+        // card.addEventListener('click', () => {
+        //   // console.log(card.text);
+        //   // console.log(card);
+        //   console.log(this.fieldCards);
+        // });
+
+        this.fCards[i].addEventListener('click', () => {
           // console.log(card.text);
-          // console.log(card);
-          if (card.text === 'H:A') {
-            console.log('aaaaaa');
-          } else {
-            console.log(card.text);
-          }
+          console.log(this.fCards[i].text);
+
+          console.log(this.fieldCards);
+          console.log(this.fCards);
         });
       }
     };
