@@ -14,13 +14,13 @@ export class Card {
 
 export class Deck {
   public static _SUITS = ['H', 'D', 'C', 'S'];
-  public static _RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K'];
+  public static _RANKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13'];
   // public cards: Card[];
   public cards: Card[] = [];
 
   constructor() {
     this.cards = this.createDeck();
-    this.shuffleDeck();
+    // this.shuffleDeck();
   }
 
   public createDeck(): Card[] {

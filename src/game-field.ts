@@ -31,6 +31,8 @@ export class GameField {
   public init() {
     this.lineUpCards();
 
+    console.log(this.fieldCards);
+
     createjs.Ticker.addEventListener('tick', handleTick);
     function handleTick() {
       GameField.stage.update();
@@ -192,3 +194,40 @@ export class GameField {
 //     console.log(result);
 //   }
 // })();
+
+// const arr = [1, 2, 3, 4];
+// const init = 0;
+// const sum = arr.reduce((total, current) => total + current, init);
+// console.log(sum);
+
+// 15になる組み合わせ
+// [
+//   [6, 9],
+//   [7, 8],
+//   [1, 5, 9],
+//   [1, 6, 8],
+//   [2, 4, 9],
+//   [2, 5, 8],
+//   [2, 6, 7],
+//   [3, 4, 8],
+//   [3, 5, 7],
+//   [4, 5, 6],
+//   [1, 2, 4, 8],
+//   [1, 2, 5, 7],
+//   [1, 3, 4, 7],
+//   [2, 3, 4, 6],
+//   [1, 2, 3, 4, 5]
+// ]
+
+// const Harr = [];
+// const Carr = [];
+// const Sarr = [];
+// const Darr = [];
+
+// for (const word of this.fieldCards) {
+//   // console.log(word.suit);
+//   if (word.suit === 'H') Harr.push(+word.rank);
+//   if (word.suit === 'C') Carr.push(+word.rank);
+//   if (word.suit === 'S') Sarr.push(+word.rank);
+//   if (word.suit === 'D') Darr.push(+word.rank);
+// }
