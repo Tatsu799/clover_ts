@@ -20,7 +20,7 @@ export class Deck {
 
   constructor() {
     this.cards = this.createDeck();
-    // this.shuffleDeck();
+    this.shuffleDeck();
   }
 
   public createDeck(): Card[] {

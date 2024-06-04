@@ -38,7 +38,69 @@ export class GameField {
       GameField.stage.update();
     }
     // GameField.stage.update();
+
+    /////////////////////////////////////
+    const mainArr = [
+      [6, 9],
+      [7, 8],
+      [1, 5, 9],
+      [1, 6, 8],
+      [2, 4, 9],
+      [2, 5, 8],
+      [2, 6, 7],
+      [3, 4, 8],
+      [3, 5, 7],
+      [4, 5, 6],
+      [1, 2, 4, 8],
+      [1, 2, 5, 7],
+      [1, 3, 4, 7],
+      [2, 3, 4, 6],
+      [1, 2, 3, 4, 5],
+    ];
+
+    let Harr: number[] = [];
+    let Carr: number[] = [];
+    let Sarr: number[] = [];
+    let Darr: number[] = [];
+
+    let subArr = [Harr, Carr, Sarr, Darr];
+    for (const word of this.fieldCards) {
+      if (word.suit === 'H') Harr.push(+word.rank);
+      if (word.suit === 'C') Carr.push(+word.rank);
+      if (word.suit === 'S') Sarr.push(+word.rank);
+      if (word.suit === 'D') Darr.push(+word.rank);
+    }
+
+    // console.log(subArr);
+
+    // console.log(mainArr);
+    console.log(Harr);
+    console.log(Carr);
+    console.log(Sarr);
+    console.log(Darr);
+
+    function check() {
+      let result;
+      for (let i = 0; i < subArr.length; i++) {
+        for (let j = 0; j < mainArr.length; j++) {
+          if (subArr[i].every((ele) => mainArr[j].includes(ele))) {
+            console.log(
+              `${subArr[i]}`,
+              subArr[i].every((ele) => mainArr[j].includes(ele))
+            );
+            result = true;
+          } else {
+            continue;
+          }
+        }
+      }
+      return result;
+    }
+
+    console.log(check());
   }
+
+  ////////////////////////////////
 
   public getFirstFieldCards() {
     for (let i = 0; i < 16; i++) {
@@ -201,7 +263,7 @@ export class GameField {
 // console.log(sum);
 
 // 15になる組み合わせ
-// [
+// const mainArr = [
 //   [6, 9],
 //   [7, 8],
 //   [1, 5, 9],
