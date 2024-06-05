@@ -31,8 +31,6 @@ export class GameField {
   public init() {
     this.lineUpCards();
 
-    console.log(this.fieldCards);
-
     createjs.Ticker.addEventListener('tick', handleTick);
     function handleTick() {
       GameField.stage.update();
@@ -41,6 +39,7 @@ export class GameField {
 
     /////////////////////////////////////
     const mainArr = [
+      [11, 12, 13],
       [6, 9],
       [7, 8],
       [1, 5, 9],
@@ -71,26 +70,21 @@ export class GameField {
       if (word.suit === 'D') Darr.push(+word.rank);
     }
 
-    // console.log(subArr);
-
-    // console.log(mainArr);
-    console.log(Harr);
-    console.log(Carr);
-    console.log(Sarr);
-    console.log(Darr);
+    // console.log(this.fieldCards);
+    // console.log('H', Harr);
+    // console.log('C', Carr);
+    // console.log('S', Sarr);
+    // console.log('D', Darr);
 
     function check() {
       let result;
       for (let i = 0; i < subArr.length; i++) {
         for (let j = 0; j < mainArr.length; j++) {
-          if (subArr[i].every((ele) => mainArr[j].includes(ele))) {
-            console.log(
-              `${subArr[i]}`,
-              subArr[i].every((ele) => mainArr[j].includes(ele))
-            );
-            result = true;
+          if (mainArr[j].every((ele) => subArr[i].includes(ele))) {
+            return true;
           } else {
-            continue;
+            result = false;
+            // continue;
           }
         }
       }
@@ -107,10 +101,6 @@ export class GameField {
       this.fieldCards.push(this.deck.cards[i]);
     }
   }
-
-  // public drawCard() {
-
-  // }
 
   public lineUpCards() {
     this.getFirstFieldCards();
@@ -152,10 +142,9 @@ export class GameField {
 
         this.fCards[i].addEventListener('click', () => {
           // console.log(card.text);
-          console.log(this.fCards[i].text);
-
-          console.log(this.fieldCards);
-          console.log(this.fCards);
+          // console.log(this.fCards[i].text);
+          // console.log(this.fieldCards);
+          // console.log(this.fCards);
         });
       }
     };
@@ -215,6 +204,7 @@ export class GameField {
   }
 }
 
+//////////////// 参考 ////////////////
 // let stage = new createjs.Stage('canvas');
 // let shape0 = new createjs.Shape();
 // let shape1 = new createjs.Shape();
@@ -293,3 +283,4 @@ export class GameField {
 //   if (word.suit === 'S') Sarr.push(+word.rank);
 //   if (word.suit === 'D') Darr.push(+word.rank);
 // }
+//////////////// 参考 ////////////////
