@@ -3,6 +3,8 @@ export class Card {
   public rank: string;
   public index: number;
   public currentPos: number; //
+  public cardImage: createjs.Text = new createjs.Text();
+  public isClicked: boolean = false; ///
 
   constructor(suit: string, rank: string, index: number, currentPos: number) {
     this.suit = suit;
@@ -15,24 +17,25 @@ export class Card {
 export class Deck {
   public static _SUITS = ['H', 'D', 'C', 'S'];
   public static _RANKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13'];
-  // public cards: Card[];
-  public cards: Card[] = [];
+  public cards: Card[];
+  // public cards: Card[] = [];
 
   constructor() {
-    this.cards = this.createDeck();
+    this.cards = Deck.createDeck();
     this.shuffleDeck();
   }
 
-  public createDeck(): Card[] {
+  public static createDeck(): Card[] {
     const suitsLen = Deck._SUITS.length; //4
     const rankLen = Deck._RANKS.length; //12
+    const cards: Card[] = [];
 
     for (let i = 0; i < suitsLen; i++) {
       for (let j = 0; j < rankLen; j++) {
-        this.cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j, 0));
+        cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j, 0));
       }
     }
-    return this.cards;
+    return cards;
   }
 
   //上と同じ処理

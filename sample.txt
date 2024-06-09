@@ -1,0 +1,502 @@
+import { Deck, Card } from './deck';
+import { Position } from './position';
+
+export class GameField {
+  public deck: Deck = new Deck();
+  public cardsPos: Position = new Position();
+  public fieldCards: Card[] = []; //フィールドにあるカードを管理
+  public setTimeId: number = 0;
+  // public calcTotalNumber: number = 0;
+  public selectCard: Card[] = [];
+  public sumNumber: number = 0;
+
+  // public fCards: createjs.Text[] = [];
+
+  public static stage = new createjs.Stage('canvas');
+  public mainArr: number[][] = [
+    [11, 12, 13],
+    [6, 9],
+    [7, 8],
+    [1, 5, 9],
+    [1, 6, 8],
+    [2, 4, 9],
+    [2, 5, 8],
+    [2, 6, 7],
+    [3, 4, 8],
+    [3, 5, 7],
+    [4, 5, 6],
+    [1, 2, 4, 8],
+    [1, 2, 5, 7],
+    [1, 3, 4, 7],
+    [2, 3, 4, 6],
+    [1, 2, 3, 4, 5],
+  ];
+
+  constructor() {
+    window.addEventListener('load', () => {
+      this.init();
+    });
+
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+
+    startBtn?.addEventListener('click', () => {
+      const startTime = Date.now();
+      this.countTime(startTime);
+    });
+
+    stopBtn?.addEventListener('click', () => {
+      clearTimeout(this.setTimeId);
+    });
+  }
+
+  public init() {
+    this.lineUpCards();
+
+    createjs.Ticker.addEventListener('tick', handleTick);
+    function handleTick() {
+      GameField.stage.update();
+    }
+    // console.log(this.check());
+    // console.log(this.fieldCards);
+  }
+
+  private sleep = async (second: number) => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, second);
+    });
+  };
+
+  public lineUpCards() {
+    //ここはAnnimateの画像入れ替え
+    let deck = new createjs.Text('DECK', '20px serif');
+    GameField.stage.addChild(deck);
+    deck.x = 380;
+    deck.y = 380;
+
+    this.getFirstFieldCards();
+  }
+
+  public getFirstFieldCards = async () => {
+    for (let i = 0; i < 16; i++) {
+      await this.sleep(100);
+
+      //ここはAnimateの画像に変える
+      // let card = new createjs.Text(`${this.fieldCards[i].suit}:${this.fieldCards[i].rank}`, '20px serif'); //
+
+      let card: createjs.Text;
+      const createText = async () => {
+        card = new createjs.Text(`${this.deck.cards[i].suit}:${this.deck.cards[i].rank}`, '30px serif'); //
+        GameField.stage.addChild(card);
+        card.x = 380;
+        card.y = 380;
+        createjs.Tween.get(card).to({ x: this.cardsPos.position[i].x, y: this.cardsPos.position[i].y }, 500);
+      };
+      await createText();
+
+      const update = async () => {
+        this.fieldCards.push(this.deck.cards[i]);
+        this.fieldCards[i].currentPos = this.cardsPos.position[i].pos;
+        this.fieldCards[i].cardImage = card;
+        this.deck.cards.shift();
+      };
+      await update();
+    }
+    this.clickEvent();
+    console.log(this.deck.cards);
+  };
+
+  // private clickEvent = () => {
+  //   console.log(this.fieldCards);
+  //   const allArr = this.makeArray();
+  //   console.log(allArr);
+  //   for (let i = 0; i < this.fieldCards.length; i++) {
+  //     this.fieldCards[i].cardImage.addEventListener('click', () => {
+  //       ////
+
+  //       // this.checkCardsState(this.fieldCards[i]);
+  //       // const sortedArry = this.makeArray(); ///////
+  //       // console.log(sortedArry);
+
+  //       if (this.selectCard.length === 0) {
+  //         this.checkCardsState(this.fieldCards[i]);
+  //         // this.calcNumbers();
+  //       } else if (this.selectCard.length > 0 && this.selectCard[0].suit === this.fieldCards[i].suit) {
+  //         this.checkCardsState(this.fieldCards[i]);
+  //         this.calcNumbers();
+
+  //         if (this.sumNumber === 15) {
+  //           // createjs.Tween.get(this.fieldCards[i].cardImage)
+  //           //   .to({ scale: 0 }, 500)
+  //           //   .call(() => this.removeCard(this.selectCard));
+  //           createjs.Tween.get(this.fieldCards[i].cardImage)
+  //             .to({ scale: 0, regY: 0, regX: -50 }, 500)
+  //             .call(() => this.removeCard(this.selectCard))
+  //             .call(() => {
+  //               let temp = new createjs.Text(`${this.deck.cards[20].suit}:${this.deck.cards[20].rank}`, '30px serif'); //
+  //               temp.x = 380;
+  //               temp.y = 380;
+  //               createjs.Tween.get(temp).to({ x: this.cardsPos.position[i].x, y: this.cardsPos.position[i].y }, 1000);
+  //               GameField.stage.addChild(temp);
+  //             });
+  //         } else if (this.sumNumber > 15) {
+  //           this.selectCard = [];
+  //           this.sumNumber = 0;
+  //         }
+  //         console.log(this.selectCard);
+  //       } else {
+  //         this.selectCard = [];
+  //         this.sumNumber = 0;
+  //         this.checkCardsState(this.fieldCards[i]);
+  //       }
+
+  //       console.log('sssssss', this.selectCard);
+  //       console.log(this.sumNumber); ///
+  //       // if (this.sumNumber === 15) {
+  //       //   createjs.Tween.get(this.fieldCards[i].cardImage)
+  //       //     // .to({ scale: 0 }, 0)
+  //       //     // .call(() => GameField.stage.removeChild(this.fieldCards[i].cardImage))
+  //       //     .to({ scale: 0 }, 500)
+  //       //     .call(() => this.removeCard(this.selectCard));
+
+  //       //   // this.selectCard = [];
+  //       //   // this.sumNumber = 0;
+  //       // } else if (this.sumNumber > 15) {
+  //       //   this.changeClickState(this.fieldCards[i]);
+  //       //   this.selectCard = [];
+  //       //   this.sumNumber = 0;
+  //       // }
+  //       // console.log(this.selectCard);
+
+  //       //これは使う
+  //       //   createjs.Tween.get(this.fieldCards[i].cardImage)
+  //       //     .to({ scale: 0, regY: 0, regX: -50 }, 500)
+  //       //     // .call(() => GameField.stage.removeChild(this.fieldCards[i].cardImage))
+  //       //     .call(() => this.removeCard(this.selectCard))
+  //       //     .call(() => {
+  //       //       let temp = new createjs.Text(`${this.deck.cards[20].suit}:${this.deck.cards[20].rank}`, '30px serif'); //
+  //       //       temp.x = 380;
+  //       //       temp.y = 380;
+  //       //       createjs.Tween.get(temp).to({ x: this.cardsPos.position[i].x, y: this.cardsPos.position[i].y }, 1000);
+  //       //       GameField.stage.addChild(temp);
+
+  //       //       // this.getNewCard(this.fieldCards[i].currentPos);
+  //       //       // this.drawFromDeck();
+  //       //       // console.log(this.deck.cards);
+  //       //       // console.log(this.fieldCards);
+  //       //     });
+  //     });
+  //   }
+  // };
+
+  private test = (fieldCards: Card) => {
+    if (this.selectCard.length === 0) {
+      this.checkCardsState(fieldCards);
+      // this.calcNumbers();
+    } else if (this.selectCard.length > 0 && this.selectCard[0].suit === fieldCards.suit) {
+      this.checkCardsState(fieldCards);
+      this.calcNumbers();
+
+      if (this.sumNumber === 15) {
+        // createjs.Tween.get(this.fieldCards[i].cardImage)
+        //   .to({ scale: 0 }, 500)
+        //   .call(() => this.removeCard(this.selectCard));
+        createjs.Tween.get(fieldCards.cardImage)
+          .to({ scale: 0, regY: 0, regX: -50 }, 500)
+          .call(() => this.removeCard(this.selectCard))
+          .call(() => {
+            let temp = new createjs.Text(`${this.deck.cards[20].suit}:${this.deck.cards[20].rank}`, '30px serif'); //
+            temp.x = 380;
+            temp.y = 380;
+            createjs.Tween.get(temp).to(
+              { x: this.cardsPos.position[fieldCards.currentPos].x, y: this.cardsPos.position[fieldCards.currentPos].y },
+              1000
+            );
+            GameField.stage.addChild(temp);
+          });
+      } else if (this.sumNumber > 15) {
+        this.selectCard = [];
+        this.sumNumber = 0;
+      }
+      console.log(this.selectCard);
+    } else {
+      this.selectCard = [];
+      this.sumNumber = 0;
+      this.checkCardsState(fieldCards);
+      console.log('発火！！！！！！');
+    }
+
+    console.log('sssssss', this.selectCard);
+    console.log(this.sumNumber); ///
+  };
+
+  private clickEvent = () => {
+    console.log(this.fieldCards);
+    const allArr = this.makeArray();
+    console.log(allArr);
+    for (let i = 0; i < this.fieldCards.length; i++) {
+      this.fieldCards[i].cardImage.addEventListener('click', () => this.test(this.fieldCards[i]));
+
+      /////
+      // this.fieldCards[i].cardImage.addEventListener('click', () => {
+      /////
+      // this.checkCardsState(this.fieldCards[i]);
+      // const sortedArry = this.makeArray();
+      // console.log(sortedArry);
+      // if (this.selectCard.length === 0) {
+      //   this.checkCardsState(this.fieldCards[i]);
+      //   // this.calcNumbers();
+      // } else if (this.selectCard.length > 0 && this.selectCard[0].suit === this.fieldCards[i].suit) {
+      //   this.checkCardsState(this.fieldCards[i]);
+      //   this.calcNumbers();
+      //   if (this.sumNumber === 15) {
+      //     // createjs.Tween.get(this.fieldCards[i].cardImage)
+      //     //   .to({ scale: 0 }, 500)
+      //     //   .call(() => this.removeCard(this.selectCard));
+      //     createjs.Tween.get(this.fieldCards[i].cardImage)
+      //       .to({ scale: 0, regY: 0, regX: -50 }, 500)
+      //       .call(() => this.removeCard(this.selectCard))
+      //       .call(() => {
+      //         let temp = new createjs.Text(`${this.deck.cards[20].suit}:${this.deck.cards[20].rank}`, '30px serif'); //
+      //         temp.x = 380;
+      //         temp.y = 380;
+      //         createjs.Tween.get(temp).to({ x: this.cardsPos.position[i].x, y: this.cardsPos.position[i].y }, 1000);
+      //         GameField.stage.addChild(temp);
+      //       });
+      //   } else if (this.sumNumber > 15) {
+      //     this.selectCard = [];
+      //     this.sumNumber = 0;
+      //   }
+      //   console.log(this.selectCard);
+      // } else {
+      //   this.selectCard = [];
+      //   this.sumNumber = 0;
+      //   this.checkCardsState(this.fieldCards[i]);
+      //   this.clickEvent();
+      //   console.log('発火！！！！！！');
+      // }
+      // console.log('sssssss', this.selectCard);
+      // console.log(this.sumNumber); ///
+      // if (this.sumNumber === 15) {
+      //   createjs.Tween.get(this.fieldCards[i].cardImage)
+      //     // .to({ scale: 0 }, 0)
+      //     // .call(() => GameField.stage.removeChild(this.fieldCards[i].cardImage))
+      //     .to({ scale: 0 }, 500)
+      //     .call(() => this.removeCard(this.selectCard));
+      //   // this.selectCard = [];
+      //   // this.sumNumber = 0;
+      // } else if (this.sumNumber > 15) {
+      //   this.changeClickState(this.fieldCards[i]);
+      //   this.selectCard = [];
+      //   this.sumNumber = 0;
+      // }
+      // console.log(this.selectCard);
+      //これは使う
+      //   createjs.Tween.get(this.fieldCards[i].cardImage)
+      //     .to({ scale: 0, regY: 0, regX: -50 }, 500)
+      //     // .call(() => GameField.stage.removeChild(this.fieldCards[i].cardImage))
+      //     .call(() => this.removeCard(this.selectCard))
+      //     .call(() => {
+      //       let temp = new createjs.Text(`${this.deck.cards[20].suit}:${this.deck.cards[20].rank}`, '30px serif'); //
+      //       temp.x = 380;
+      //       temp.y = 380;
+      //       createjs.Tween.get(temp).to({ x: this.cardsPos.position[i].x, y: this.cardsPos.position[i].y }, 1000);
+      //       GameField.stage.addChild(temp);
+      //       // this.getNewCard(this.fieldCards[i].currentPos);
+      //       // this.drawFromDeck();
+      //       // console.log(this.deck.cards);
+      //       // console.log(this.fieldCards);
+      //     });
+      // });
+    }
+  };
+
+  private removeCard = (cardArr: Card[]) => {
+    for (const card of cardArr) {
+      GameField.stage.removeChild(card.cardImage);
+    }
+  };
+
+  private changeClickState = (card: Card) => {
+    card.isClicked = !card.isClicked;
+  };
+
+  private getSelectCard = (card: Card) => {
+    if (card.isClicked) this.selectCard.push(card);
+  };
+
+  private removeSelectCard = (card: Card) => {
+    if (this.selectCard.includes(card)) {
+      const index = this.selectCard.findIndex((ele) => ele === card);
+      this.selectCard.splice(index, 1);
+      // console.log(index);
+      // console.log(result);
+      console.log(this.selectCard);
+    }
+
+    // console.log(this.selectCard);
+  };
+
+  private checkCardsState = (card: Card): void => {
+    if (!card.isClicked) {
+      this.changeClickState(card);
+      this.getSelectCard(card);
+    } else {
+      this.changeClickState(card);
+      this.removeSelectCard(card);
+    }
+  };
+
+  // private drawFromDeck = (): void => {
+  //   this.deck.cards.shift();
+  // };
+
+  // private getNewCard = (position: number): void => {
+  //   let newCard = new createjs.Text(`${this.deck.cards[0].suit}:${this.deck.cards[0].rank}`, '30px serif'); //
+  //   newCard.x = 380;
+  //   newCard.y = 380;
+  //   createjs.Tween.get(newCard).to({ x: this.cardsPos.position[position].x, y: this.cardsPos.position[position].y }, 1000);
+  //   GameField.stage.addChild(newCard);
+  // };
+
+  private calcNumbers = (): void => {
+    this.sumNumber = this.selectCard.reduce((total: number, num: Card) => total + +num.rank, 0);
+  };
+
+  private makeArray = (): number[][] => {
+    let hartArr: number[] = [];
+    let diamondArr: number[] = [];
+    let cloverArr: number[] = [];
+    let spadeArr: number[] = [];
+
+    let subArr = [hartArr, diamondArr, cloverArr, spadeArr];
+    // let subArr = [Harr, Carr, Sarr, Darr];
+    for (const word of this.fieldCards) {
+      if (word.suit === 'H') hartArr.push(+word.rank);
+      if (word.suit === 'D') diamondArr.push(+word.rank);
+      if (word.suit === 'C') cloverArr.push(+word.rank);
+      if (word.suit === 'S') spadeArr.push(+word.rank);
+    }
+
+    // console.log('aaaaaaaa', subArr[0]);
+
+    return subArr;
+  };
+
+  // [key: string]: number;
+  // private check = (): boolean => {
+  //   let subArr = this.makeArray();
+  //   console.log('aaaaaaa', subArr);
+
+  //   for (let i = 0; i < subArr.length; i++) {
+  //     for (let j = 0; j < this.mainArr.length; j++) {
+  //       if (this.mainArr[j].every((ele) => subArr[i].includes(ele))) {
+  //         return true;
+  //       } else {
+  //         continue;
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // };
+
+  //時間の表示
+  private countTime(startTime: number) {
+    const timer = document.getElementById('timer');
+    const time = new Date(Date.now() - startTime);
+
+    const m = String(time.getMinutes()).padStart(2, '0');
+    const s = String(time.getSeconds()).padStart(2, '0');
+    timer!.textContent = `${m}:${s}`;
+
+    this.setTimeId = window.setTimeout(() => {
+      this.countTime(startTime);
+    }, 10);
+  }
+}
+
+//////////////// 参考 ////////////////
+// let stage = new createjs.Stage('canvas');
+// let shape0 = new createjs.Shape();
+// let shape1 = new createjs.Shape();
+// let shape2 = new createjs.Shape();
+// let shapes = [shape0, shape1, shape2];
+// shapes[0].graphics.beginFill('DarkRed');
+// shapes[1].graphics.beginFill('DarkBlue');
+// shapes[2].graphics.beginFill('DarkGreen');
+// for (let i = 0; i < 3; i++) {
+//   shapes[i].graphics.drawRect(0, 0, 10, 12);
+//   stage.addChild(shapes[i]);
+//   shapes[i].x = pos.position[i].x;
+//   shapes[i].y = pos.position[i].y;
+//   shapes[i].addEventListener('click', () => {
+//     console.log(pos.position[i].color);
+//   });
+
+// // 対象の反復オブジェクト
+// const targetArr = [1, 2, 3];
+
+// // 実行する関数
+// const sampleFunc = (value: number) => {
+//   // asyncの効果は各functionブロックで切れるので逐一指定が必要
+//   return new Promise((resolve) => {
+//     // 2秒待ってから計算結果をresolveする
+//     setTimeout(() => {
+//       console.log('Calculating...');
+//       resolve(value * 2);
+//     }, 1000);
+//   });
+// };
+
+// // for await...of文は必ずasyncの中で
+// let num;
+// (async () => {
+//   for await (num of targetArr) {
+//     // 関数の実行結果を格納して表示
+//     const result = await sampleFunc(num);
+//     console.log(result);
+//   }
+// })();
+
+// const arr = [1, 2, 3, 4];
+// const init = 0;
+// const sum = arr.reduce((total, current) => total + current, init);
+// console.log(sum);
+
+// 15になる組み合わせ
+// const mainArr = [
+//   [6, 9],
+//   [7, 8],
+//   [1, 5, 9],
+//   [1, 6, 8],
+//   [2, 4, 9],
+//   [2, 5, 8],
+//   [2, 6, 7],
+//   [3, 4, 8],
+//   [3, 5, 7],
+//   [4, 5, 6],
+//   [1, 2, 4, 8],
+//   [1, 2, 5, 7],
+//   [1, 3, 4, 7],
+//   [2, 3, 4, 6],
+//   [1, 2, 3, 4, 5]
+// ]
+
+// const Harr = [];
+// const Carr = [];
+// const Sarr = [];
+// const Darr = [];
+
+// for (const word of this.fieldCards) {
+//   // console.log(word.suit);
+//   if (word.suit === 'H') Harr.push(+word.rank);
+//   if (word.suit === 'C') Carr.push(+word.rank);
+//   if (word.suit === 'S') Sarr.push(+word.rank);
+//   if (word.suit === 'D') Darr.push(+word.rank);
+// }
+//////////////// 参考 ////////////////
+
+// オブジェクトの型定義
+// interface Item {
+//   [key: string]: number;
+// }

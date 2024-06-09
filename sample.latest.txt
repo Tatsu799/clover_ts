@@ -116,66 +116,73 @@ export class GameField {
     for (let i = 0; i < this.fieldCards.length; i++) {
       this.fieldCards[i].cardImage.addEventListener('click', () => this.event(deck, this.fieldCards[i]));
     }
+
+    // for (let i = 0; i < this.fieldCards.length; i++) {
+    //   this.fieldCards[i].cardImage.addEventListener('click', () => this.event(this.fieldCards[i]));
+    //   // this.fieldCards[i].cardImage.addEventListener('click', () => {
+    //   //   console.log('clicked~!!!!!');
+    //   //   // this.removeEvent();
+    //   // });
+    // }
+  };
+
+  private addEvent = (ele: createjs.Text) => {
+    ele.addEventListener('click', () => console.log('aaaaa'));
   };
 
   private event = (deck: Deck, fieldCards: Card): void => {
     console.log('clicked~!!!!!');
-    // console.log(deck);
-    // console.log(fieldCards);
+    console.log(deck);
+    console.log(fieldCards);
 
-    // GameField.stage.removeChild(fieldCards.cardImage);
-    // let temp = new createjs.Text(`${deck.cards[20].suit}:${deck.cards[20].rank}`, '30px serif'); //
-    // deck.cards[0].cardImage = temp;
+    GameField.stage.removeChild(fieldCards.cardImage);
+    let temp = new createjs.Text(`${deck.cards[20].suit}:${deck.cards[20].rank}`, '30px serif'); //
+    deck.cards[0].cardImage = temp;
 
-    // temp.x = 380;
-    // temp.y = 380;
-    // GameField.stage.addChild(temp);
-    // createjs.Tween.get(temp)
-    //   .to({ x: this.cardsPos.position[fieldCards.currentPos].x, y: this.cardsPos.position[fieldCards.currentPos].y }, 1000)
-    //   .wait(3000)
-    //   .call(() => temp.addEventListener('click', () => this.event(deck, fieldCards)));
+    temp.x = 380;
+    temp.y = 380;
+    GameField.stage.addChild(temp);
+    createjs.Tween.get(temp)
+      .to({ x: this.cardsPos.position[fieldCards.currentPos].x, y: this.cardsPos.position[fieldCards.currentPos].y }, 1000)
+      .wait(3000)
+      .call(() => temp.addEventListener('click', () => console.log('aaaa')));
 
-    if (this.selectCard.length === 0) {
-      this.checkCardsState(fieldCards);
-    } else if (this.selectCard.length > 0 && this.selectCard[0].suit === fieldCards.suit) {
-      this.checkCardsState(fieldCards);
-      this.calcNumbers();
+    // this.addEvent(deck.cards[20].cardImage);
 
-      if (this.sumNumber === 15) {
-        console.log(deck.cards);
-        console.log(this.fieldCards);
+    // if (this.selectCard.length === 0) {
+    //   this.checkCardsState(fieldCards);
+    // } else if (this.selectCard.length > 0 && this.selectCard[0].suit === fieldCards.suit) {
+    //   this.checkCardsState(fieldCards);
+    //   this.calcNumbers();
 
-        createjs.Tween.get(this.selectCard)
-          .to({ scale: 0, regY: 0, regX: -50 }, 500)
-          .call(() => this.removeCard(this.selectCard))
-          .call(() => {
-            let newCard = new createjs.Text(`${deck.cards[0].suit}:${deck.cards[0].rank}`, '30px serif'); //
-            newCard.x = 380;
-            newCard.y = 380;
-            deck.cards[0].cardImage = newCard;
-            createjs.Tween.get(newCard).to(
-              { x: this.cardsPos.position[fieldCards.currentPos].x, y: this.cardsPos.position[fieldCards.currentPos].y },
-              1000
-            );
-            GameField.stage.addChild(newCard);
-            this.selectCard = [];
-            this.sumNumber = 0;
-            newCard.addEventListener('click', () => this.event(deck, deck.cards[0]));
-          });
-        // .call(() => this.clickEvent(deck));
-      } else if (this.sumNumber > 15) {
-        this.selectCard = [];
-        this.sumNumber = 0;
-      }
-    } else {
-      this.selectCard = [];
-      this.sumNumber = 0;
-      this.checkCardsState(fieldCards);
-      console.log('発火！！！！！！');
-    }
+    //   if (this.sumNumber === 15) {
+    //     createjs.Tween.get(cardImage)
+    //       .to({ scale: 0, regY: 0, regX: -50 }, 500)
+    //       .call(() => this.removeCard(cardImage))
+    //       .call(() => {
+    //         let temp = new createjs.Text(`${deck.cards[20].suit}:${deck.cards[20].rank}`, '30px serif'); //
+    //         temp.x = 380;
+    //         temp.y = 380;
+    //         createjs.Tween.get(temp).to(
+    //           { x: this.cardsPos.position[fieldCards.currentPos].x, y: this.cardsPos.position[fieldCards.currentPos].y },
+    //           1000
+    //         );
+    //         GameField.stage.addChild(temp);
+    //       });
+    //   } else if (this.sumNumber > 15) {
+    //     this.selectCard = [];
+    //     this.sumNumber = 0;
+    //   }
+    //   console.log(this.selectCard);
+    // } else {
+    //   this.selectCard = [];
+    //   this.sumNumber = 0;
+    //   this.checkCardsState(fieldCards);
+    //   console.log('発火！！！！！！');
+    // }
 
-    console.log('sssssss', this.selectCard);
-    console.log(this.sumNumber); ///
+    // console.log('sssssss', this.selectCard);
+    // console.log(this.sumNumber); ///
   };
 
   // private removeEvent = () => {
@@ -233,42 +240,42 @@ export class GameField {
   //   }
   // };
 
-  private removeCard = (selectCard: Card[]) => {
-    // GameField.stage.removeChild(cardImage);
-    for (const card of selectCard) {
-      GameField.stage.removeChild(card.cardImage);
-    }
-  };
+  // private removeCard = (cardImage: createjs.Text) => {
+  //   GameField.stage.removeChild(cardImage);
+  //   // for (const card of cardArr) {
+  //   //   GameField.stage.removeChild(card.cardImage);
+  //   // }
+  // };
 
-  private changeClickState = (card: Card) => {
-    card.isClicked = !card.isClicked;
-  };
+  // private changeClickState = (card: Card) => {
+  //   card.isClicked = !card.isClicked;
+  // };
 
-  private getSelectCard = (card: Card) => {
-    if (card.isClicked) this.selectCard.push(card);
-  };
+  // private getSelectCard = (card: Card) => {
+  //   if (card.isClicked) this.selectCard.push(card);
+  // };
 
-  private removeSelectCard = (card: Card) => {
-    if (this.selectCard.includes(card)) {
-      const index = this.selectCard.findIndex((ele) => ele === card);
-      this.selectCard.splice(index, 1);
-      // console.log(index);
-      // console.log(result);
-      console.log(this.selectCard);
-    }
+  // private removeSelectCard = (card: Card) => {
+  //   if (this.selectCard.includes(card)) {
+  //     const index = this.selectCard.findIndex((ele) => ele === card);
+  //     this.selectCard.splice(index, 1);
+  //     // console.log(index);
+  //     // console.log(result);
+  //     console.log(this.selectCard);
+  //   }
 
-    // console.log(this.selectCard);
-  };
+  //   // console.log(this.selectCard);
+  // };
 
-  private checkCardsState = (card: Card): void => {
-    if (!card.isClicked) {
-      this.changeClickState(card);
-      this.getSelectCard(card);
-    } else {
-      this.changeClickState(card);
-      this.removeSelectCard(card);
-    }
-  };
+  // private checkCardsState = (card: Card): void => {
+  //   if (!card.isClicked) {
+  //     this.changeClickState(card);
+  //     this.getSelectCard(card);
+  //   } else {
+  //     this.changeClickState(card);
+  //     this.removeSelectCard(card);
+  //   }
+  // };
 
   // // private drawFromDeck = (): void => {
   // //   this.deck.cards.shift();
@@ -282,9 +289,9 @@ export class GameField {
   // //   GameField.stage.addChild(newCard);
   // // };
 
-  private calcNumbers = (): void => {
-    this.sumNumber = this.selectCard.reduce((total: number, num: Card) => total + +num.rank, 0);
-  };
+  // private calcNumbers = (): void => {
+  //   this.sumNumber = this.selectCard.reduce((total: number, num: Card) => total + +num.rank, 0);
+  // };
 
   // private makeArray = (): number[][] => {
   //   let hartArr: number[] = [];
