@@ -51,7 +51,78 @@ export class GameField {
   }
 
   public init() {
-    this.lineUpCards();
+    // this.lineUpCards();
+
+    //////////////////////////////////////////
+    /////ここから下は消す
+    const gaugeWidth = 200;
+    const gaugeHeight = 20;
+
+    //ゲージを描画する関数
+    function drawGauge(x: number, y: number, width: number, height: number, value: number) {
+      const shape = new createjs.Shape();
+      const g = shape.graphics;
+
+      g.beginFill('#00F'); // ゲージの色
+      g.drawRect(x, y, width * value, height); // ゲージの値に応じて描画
+      g.endFill();
+
+      return shape;
+    }
+
+    //////////////////
+
+    let gaugeValue = 1;
+
+    const gauge = drawGauge(0, 0, gaugeWidth, gaugeHeight, gaugeValue);
+    GameField.stage.addChild(gauge);
+
+    // GameField.stage.update();
+    //////////////////
+    function updateGauge() {
+      gaugeValue -= 0.01; // ゲージの減少量
+
+      // ゲージが0未満になった場合は0に補正
+      if (gaugeValue < 0) {
+        gaugeValue = 0;
+      }
+
+      // ゲージを再描画
+      gauge.graphics
+        .clear()
+        .beginFill('#00F')
+        .drawRect(0, 0, gaugeWidth * gaugeValue, gaugeHeight)
+        .endFill();
+
+      updateGauge();
+      function updateGauge() {
+        gaugeValue -= 0.01; // ゲージの減少量
+
+        // ゲージが0未満になった場合は0に補正
+        if (gaugeValue < 0) {
+          gaugeValue = 0;
+        }
+
+        // ゲージを再描画
+        gauge.graphics
+          .clear()
+          .beginFill('#00F')
+          .drawRect(0, 0, gaugeWidth * gaugeValue, gaugeHeight)
+          .endFill();
+        // GameField.stage.update();
+
+        // 100ミリ秒後に再度ゲージを更新
+        setTimeout(updateGauge, 10);
+      }
+      // GameField.stage.update();
+
+      // 100ミリ秒後に再度ゲージを更新
+      setTimeout(updateGauge, 10);
+    }
+
+    createjs.Tween.get(gauge).call(updateGauge);
+    /////ここから上は消す
+    //////////////////////////////////////////
 
     createjs.Ticker.addEventListener('tick', handleTick);
     function handleTick() {
