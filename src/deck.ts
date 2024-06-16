@@ -1,15 +1,15 @@
 export class Card {
   public suit: string;
   public rank: string;
-  public index: number;
+  // public index: number;
   public currentPos: number; //
   public cardImage: createjs.Text = new createjs.Text();
   public isClicked: boolean = false; ///
 
-  constructor(suit: string, rank: string, index: number, currentPos: number) {
+  constructor(suit: string, rank: string, currentPos: number) {
     this.suit = suit;
     this.rank = rank;
-    this.index = index;
+    // this.index = index;
     this.currentPos = currentPos;
   }
 }
@@ -22,7 +22,7 @@ export class Deck {
 
   constructor() {
     this.cards = Deck.createDeck();
-    // this.shuffleDeck();
+    this.shuffleDeck();
   }
 
   public static createDeck(): Card[] {
@@ -32,7 +32,8 @@ export class Deck {
 
     for (let i = 0; i < suitsLen; i++) {
       for (let j = 0; j < rankLen; j++) {
-        cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j, 0));
+        // cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j, 0));
+        cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j));
       }
     }
     return cards;

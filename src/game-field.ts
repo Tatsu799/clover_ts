@@ -9,10 +9,14 @@ export class GameField {
   public cardsPos: Position = new Position();
   public fieldCards: Card[] = []; //フィールドにあるカードを管理
   public setTimeId: number = 0;
-  // public calcTotalNumber: number = 0;
-  public selectCard: Card[] = [];
+  public selectCards: Card[] = [];
   public sumNumber: number = 0;
+  public countAllCards: number = 0;
 
+  // public timer: string = '';
+
+  //仮
+  public deckDisplay = new createjs.Text('DECK', '20px serif');
   public static stage = new createjs.Stage('canvas');
   public mainArr: number[][] = [
     [11, 12, 13],
@@ -38,8 +42,10 @@ export class GameField {
     const stopBtn = document.getElementById('stop');
 
     startBtn?.addEventListener('click', () => {
-      const startTime = Date.now();
-      this.countTime(startTime);
+      // const startTime = Date.now();
+      // this.countTime(startTime);
+      window.setTimeout(this.resetGame, 1000); ////
+      // this.resetGame();
     });
 
     stopBtn?.addEventListener('click', () => {
@@ -48,14 +54,15 @@ export class GameField {
   }
 
   public init() {
+    //タイマーの実行
+    // const startTime = Date.now();
+    // this.countTime(startTime);
     this.lineUpCards();
 
     createjs.Ticker.addEventListener('tick', handleTick);
     function handleTick() {
       GameField.stage.update();
     }
-    // console.log(this.check());
-    // console.log(this.fieldCards);
   }
 
   private sleep = async (second: number) => {
@@ -64,163 +71,198 @@ export class GameField {
     });
   };
 
+  //ゲーム開始時にカードを場にならべる
   public lineUpCards() {
     //ここはAnnimateの画像入れ替え
     let deck: Deck = new Deck();
+    this.countAllCards = deck.cards.length;
 
-    let displayDeck = new createjs.Text('DECK', '20px serif');
-    GameField.stage.addChild(displayDeck);
-    displayDeck.x = 380;
-    displayDeck.y = 380;
+    // let displayDeck = new createjs.Text('DECK', '20px serif');
+    GameField.stage.addChild(this.deckDisplay);
+    this.deckDisplay.x = 380;
+    this.deckDisplay.y = 380;
+
+    //仮
+    this.deckDisplay.addEventListener('click', () => console.log(this.showAllCardsCount(deck)));
 
     this.getFirstFieldCards(deck);
   }
 
-  private showCard = async (deck: Deck, index: number) => {
+  //カードの画像を表示
+  private showCardImage = async (deck: Deck, fieldIndex: number) => {
     //ここはAnimateの画像に変える
-    let card: createjs.Text = new createjs.Text(`${deck.cards[index].suit}:${deck.cards[index].rank}`, '20px serif'); //
+    let deckIndex = deck.cards.length - 1;
+    let card: createjs.Text = new createjs.Text(`${deck.cards[deckIndex].suit}:${deck.cards[deckIndex].rank}`, '20px serif'); //
     GameField.stage.addChild(card);
     card.x = 380;
     card.y = 380;
-    createjs.Tween.get(card).to({ x: this.cardsPos.position[index].x, y: this.cardsPos.position[index].y }, 500);
-    deck.cards[index].cardImage = card;
-    this.updateFieldState(deck, index);
+    createjs.Tween.get(card).to(
+      { x: this.cardsPos.fieldPosition[fieldIndex].x, y: this.cardsPos.fieldPosition[fieldIndex].y },
+      500
+    );
+    deck.cards[deckIndex].cardImage = card;
+    this.addCardToField(deck, fieldIndex);
   };
 
-  private updateFieldState = (deck: Deck, index: number): void => {
-    this.fieldCards.push(deck.cards[index]);
-    this.fieldCards[index].currentPos = this.cardsPos.position[index].pos;
+  //場と山札の枚数を表示
+  public showAllCardsCount = (deck: Deck) => {
+    this.countAllCards = deck.cards.length + this.fieldCards.length;
+    console.log(this.countAllCards);
   };
 
-  // private updateFieldCard = async (deck: Deck, index: number) => {
-  //   for (let i = 0; i < 16 - this.fieldCards.length; i++) {
-  //     await this.sleep(100);
-  //     await this.showText(deck, index);
-  //   }
-  // };
-
-  private updateDeckState = (deck: Deck, index: number): void => {
-    /////`ここ修正
-    deck.cards = deck.cards.filter((card) => card.index !== index);
-    // console.log(deck);
-  };
-
+  //開始時のフィールドに表示するカードを取得
   private getFirstFieldCards = async (deck: Deck) => {
     for (let i = 0; i < 16; i++) {
-      // const index: number = this.cardsPos.position[i].pos;
       await this.sleep(100);
-      // await this.showCard(deck, index);
-      await this.showCard(deck, i);
-      // await this.updateDeckState(deck, i);
+      await this.showCardImage(deck, i);
     }
     this.clickEvent(deck);
-    console.log(this.fieldCards);
+    await this.sleep(1000);
+    this.changeFieldCardOpacity();
+    console.log(this.checkNumberPattern());
   };
 
-  private clickEvent = (deck: Deck) => {
-    for (let i = 0; i < 16; i++) {
-      this.fieldCards[i].cardImage.addEventListener('click', () => this.event(deck, this.fieldCards[i]));
-      this.updateDeckState(deck, i);
-    }
-  };
-
-  //////////////////////////////////////////////////////////////////////////////
-  private removeAndDrawCard = (deck: Deck, fieldCard: Card, index: number) => {
-    createjs.Tween.get(this.selectCard)
-      .to({ scale: 0, regY: 0, regX: -50 }, 500)
-      .call(() => this.removeCardFromField(fieldCard))
-      .call(() => {
-        let newCard = new createjs.Text(`${deck.cards[index].suit}:${deck.cards[index].rank}`, '30px serif'); //
-        deck.cards[index].cardImage = newCard;
-        deck.cards[index].cardImage.addEventListener('click', () => this.event(deck, deck.cards[index]));
-        deck.cards[index].currentPos = fieldCard.currentPos;
-        // this.fieldCards.push(deck.cards[index]);////
-        this.fieldCards.splice(deck.cards[index].currentPos, 0, deck.cards[index]); /////
-        // GameField.stage.addChild(newCard);
-        newCard.x = 380;
-        newCard.y = 380;
-
-        createjs.Tween.get(newCard).to(
-          { x: this.cardsPos.position[fieldCard.currentPos].x, y: this.cardsPos.position[fieldCard.currentPos].y },
-          1000
-        );
-        // this.fieldCards.push(deck.cards[index]);
-        GameField.stage.addChild(newCard);
-      });
-    // console.log(this.fieldCards);
-    console.log(deck);
-  };
-
-  private event = async (deck: Deck, fieldCard: Card): Promise<void> => {
-    if (
-      this.selectCard.length === 0 ||
-      (this.selectCard[0].suit === fieldCard.suit && +this.selectCard[0].rank < 10 && +fieldCard.rank < 10)
-    ) {
-      this.changeCardState(fieldCard);
-      this.calcNumbers();
-      console.log('同じsuitで追加 数字が10以下のカード', this.selectCard);
-
-      if (this.sumNumber === 15) {
-        for (let i = 0; i < this.selectCard.length; i++) {
-          let card = this.selectCard[i];
-
-          this.removeAndDrawCard(deck, card, i);
-          await this.sleep(1000);
-          this.updateDeckState(deck, i);
-          this.clearAllOpacity(this.selectCard);
-          console.log('カードの合計値が15の場合', this.fieldCards);
-          // console.log('event 終了', this.fieldCards);
-        }
-        // this.resetSelectedCard(this.selectCard);
-        console.log('カードの合計値が15の場合のカードリセット', this.selectCard);
-      } else if (this.sumNumber > 15) {
-        this.resetSelectedCard(this.selectCard);
-        this.clearAllOpacity(this.selectCard);
-
-        console.log('合計値が15以上になった場合', this.selectCard);
-      }
-    } else if (
-      this.selectCard.length === 0 ||
-      (this.selectCard[0].suit === fieldCard.suit && +this.selectCard[0].rank > 10 && +fieldCard.rank > 10)
-    ) {
-      this.changeCardState(fieldCard);
-      this.calcNumbers();
-      console.log('数字が10以上のカードを選択', this.selectCard);
-
-      if (this.sumNumber === 36) {
-        for (let i = 0; i < this.selectCard.length; i++) {
-          let card = this.selectCard[i];
-          this.removeAndDrawCard(deck, card, i);
-          this.updateDeckState(deck, i);
-          this.clearAllOpacity(this.selectCard);
-        }
-        // this.resetSelectedCard(this.selectCard);
-      }
+  //カードを消した時の処理
+  private removeAndDrawCard = (deck: Deck, selectedCard: Card) => {
+    if (deck.cards.length !== 0) {
+      createjs.Tween.get(this.selectCards)
+        .to({ scale: 0, regY: 0, regX: -50 }, 500)
+        .call(() => this.removeCardFromField(selectedCard))
+        .call(() => this.drawNewCards(deck, selectedCard));
+      console.log('none', deck);
+      console.log(this.fieldCards);
     } else {
-      this.resetSelectedCard(this.selectCard);
-      this.changeCardState(fieldCard);
-      this.calcNumbers();
-      console.log('別のスイーツ追加', this.selectCard);
+      console.log('deck is zero!!!!!!!!!2');
+      console.log(this.countAllCards);
+      createjs.Tween.get(this.selectCards)
+        .to({ scale: 0, regY: 0, regX: -50 }, 500)
+        .call(() => this.removeCardFromField(selectedCard))
+        .call(() => this.drawNewCards(deck, selectedCard));
     }
   };
 
-  // private removeEvent = () => {
-  //   ev.removeAllEventListeners('click', this.event);
-  //   console.log('canceled');
-  // };
+  //フィールドにカードを追加する処理
+  private addCardToField = (deck: Deck, fieldIndex: number): void => {
+    const card = deck.cards.pop();
+    if (this.fieldCards.length !== 0) {
+      this.fieldCards.push(card!);
+      this.fieldCards[fieldIndex].currentPos = this.cardsPos.fieldPosition[fieldIndex].pos;
+    } else {
+      this.fieldCards.push(card!);
+      this.fieldCards[fieldIndex].currentPos = this.cardsPos.fieldPosition[fieldIndex].pos;
+    }
+  };
+
+  //山札からフィールドに追加するカードを生成
+  private drawNewCards = (deck: Deck, fieldCard: Card) => {
+    if (deck.cards.length !== 0) {
+      const cardIndex = deck.cards.length - 1;
+      const newCard = new createjs.Text(`${deck.cards[cardIndex].suit}:${deck.cards[cardIndex].rank}`, '30px serif'); //
+      deck.cards[cardIndex].cardImage = newCard;
+      deck.cards[cardIndex].cardImage.x = 380;
+      deck.cards[cardIndex].cardImage.y = 380;
+      deck.cards[cardIndex].currentPos = fieldCard.currentPos;
+      this.fieldCards.splice(deck.cards[cardIndex].currentPos, 0, deck.cards[cardIndex]); /////フィールドからカードを取り除く
+      createjs.Tween.get(deck.cards[cardIndex].cardImage).to(
+        { x: this.cardsPos.fieldPosition[fieldCard.currentPos].x, y: this.cardsPos.fieldPosition[fieldCard.currentPos].y },
+        1000
+      );
+      // deck.cards[cardIndex].cardImage.addEventListener('click', () => this.event(deck, deck.cards[cardIndex]));
+      const card = deck.cards.pop();
+      if (card !== undefined) {
+        card.cardImage.addEventListener('click', () => this.event(deck, card));
+      }
+      GameField.stage.addChild(newCard);
+    } else {
+      console.log('Deck is zero');
+      console.log(this.countAllCards);
+      GameField.stage.removeChild(this.deckDisplay);
+    }
+  };
 
   //フィールドにあるカードを取り除く
   private removeCardFromField = (selectedCard: Card) => {
     GameField.stage.removeChild(selectedCard.cardImage);
-    this.fieldCards = this.fieldCards.filter((ele) => ele !== selectedCard);
-    // console.log(this.fieldCards);
+    // this.fieldCards.splice(selectedCard.currentPos, 1); /////
+    if (this.fieldCards.includes(selectedCard)) {
+      const index = this.fieldCards.findIndex((ele) => ele === selectedCard);
+      this.fieldCards.splice(index, 1);
+    }
+    console.log('removed!!!!!', this.fieldCards);
+  };
+
+  //クリックイベントを設定
+  private clickEvent = (deck: Deck) => {
+    for (let i = 0; i < 16; i++) {
+      this.fieldCards[i].cardImage.addEventListener('click', () => this.event(deck, this.fieldCards[i]));
+    }
+  };
+
+  // private removeEvent = (fieldCard: Card) => {
+  //   fieldCard.cardImage.removeAllEventListeners('click');
+  // };
+
+  //クリックイベントの処理
+  private event = async (deck: Deck, fieldCard: Card): Promise<void> => {
+    if (
+      this.selectCards.length === 0 ||
+      (this.selectCards[0].suit === fieldCard.suit && +this.selectCards[0].rank < 10 && +fieldCard.rank < 10)
+    ) {
+      this.addCardToSelectCard(fieldCard);
+      this.calcNumbers();
+      console.log('同じsuitで追加 数字が10以下のカード', this.selectCards);
+      console.log(deck);
+
+      if (this.sumNumber === 15) {
+        for (let i = 0; i < this.selectCards.length; i++) {
+          let selectedCard = this.selectCards[i];
+          this.removeAndDrawCard(deck, selectedCard);
+          this.clearAllOpacity(this.selectCards);
+
+          console.log('カードの合計値が15の場合', this.fieldCards);
+          console.log('remove fieldCard!!!!!', this.fieldCards);
+        }
+        await this.sleep(1000);
+        this.changeFieldCardOpacity();
+        console.log(this.checkNumberPattern());
+        console.log('カードの合計値が15の場合のカードリセット', this.selectCards);
+      } else if (this.sumNumber > 15) {
+        this.resetSelectedCard(this.selectCards);
+        await this.sleep(500);
+        this.clearAllOpacity(this.selectCards);
+        console.log('合計値が15以上になった場合', this.selectCards);
+      }
+    } else if (
+      this.selectCards.length === 0 ||
+      (this.selectCards[0].suit === fieldCard.suit && +this.selectCards[0].rank > 10 && +fieldCard.rank > 10)
+    ) {
+      this.addCardToSelectCard(fieldCard);
+      this.calcNumbers();
+      console.log('数字が10以上のカードを選択', this.selectCards);
+
+      if (this.sumNumber === 36) {
+        for (let i = 0; i < this.selectCards.length; i++) {
+          let card = this.selectCards[i];
+          this.removeAndDrawCard(deck, card);
+          this.clearAllOpacity(this.selectCards);
+        }
+        await this.sleep(1000);
+        this.changeFieldCardOpacity();
+        console.log(this.checkNumberPattern());
+      }
+    } else {
+      this.resetSelectedCard(this.selectCards);
+      this.addCardToSelectCard(fieldCard);
+      this.calcNumbers();
+      console.log('別のスイーツ追加', this.selectCards);
+    }
   };
 
   //SelectedCardsリストから取り除く
   private removeSelectCard = (selectedCards: Card) => {
-    if (this.selectCard.includes(selectedCards)) {
-      const index = this.selectCard.findIndex((ele) => ele === selectedCards);
-      this.selectCard.splice(index, 1);
+    if (this.selectCards.includes(selectedCards)) {
+      const index = this.selectCards.findIndex((ele) => ele === selectedCards);
+      this.selectCards.splice(index, 1);
     }
   };
 
@@ -230,41 +272,43 @@ export class GameField {
       card.isClicked = false;
       card.cardImage.alpha = 1;
     }
-    // selectedCards.forEach((ele) => (ele.isClicked = false));
-  };
-
-  //SelectCardsをリセット
-  private resetSelectedCard = (selectedCards: Card[]) => {
-    this.selectCard = [];
-    this.sumNumber = 0;
-    this.resetClickState(selectedCards);
-  };
-
-  //クリックのon offを入れ替える
-  private changeClickState = (card: Card) => {
-    // card.isClicked = !card.isClicked;
-    if (!card.isClicked) {
-      card.isClicked = true;
-      card.cardImage.alpha = 0.5;
-    } else {
-      card.isClicked = false;
-      card.cardImage.alpha = 1;
-    }
   };
 
   //SelectedCardsリストに追加
   private pushSelectCard = (card: Card) => {
-    this.selectCard.push(card);
+    this.selectCards.push(card);
   };
 
-  //Cardのステータスを変更、SelectCardリストに追加
-  private changeCardState = (card: Card): void => {
-    if (!card.isClicked) {
-      this.changeClickState(card);
-      this.pushSelectCard(card);
-    } else {
-      this.changeClickState(card);
-      this.removeSelectCard(card);
+  //SelectCardリストに追加,Cardのステータスを変更、
+  private addCardToSelectCard = (card: Card): void => {
+    if (this.checkNumberPattern()) {
+      if (!card.isClicked) {
+        this.changeClickState(card);
+        this.pushSelectCard(card);
+      } else {
+        this.changeClickState(card);
+        this.removeSelectCard(card);
+      }
+    }
+  };
+
+  //SelectCardsをリセット
+  private resetSelectedCard = (selectedCards: Card[]) => {
+    this.selectCards = [];
+    this.sumNumber = 0;
+    this.resetClickState(selectedCards);
+  };
+
+  //クリックのonoffを入れ替える
+  private changeClickState = (card: Card) => {
+    if (this.checkNumberPattern()) {
+      if (!card.isClicked) {
+        card.isClicked = true;
+        card.cardImage.alpha = 0.5;
+      } else {
+        card.isClicked = false;
+        card.cardImage.alpha = 1;
+      }
     }
   };
 
@@ -272,63 +316,67 @@ export class GameField {
     for (const card of selectedCard) {
       card.cardImage.alpha = 1;
     }
-    // selectedCard.forEach((ele) => (ele.cardImage.alpha = 1));
-    // selectedCard.cardImage.alpha = 1;
   };
-
-  // // private drawFromDeck = (): void => {
-  // //   this.deck.cards.shift();
-  // // };
-
-  // // private getNewCard = (position: number): void => {
-  // //   let newCard = new createjs.Text(`${this.deck.cards[0].suit}:${this.deck.cards[0].rank}`, '30px serif'); //
-  // //   newCard.x = 380;
-  // //   newCard.y = 380;
-  // //   createjs.Tween.get(newCard).to({ x: this.cardsPos.position[position].x, y: this.cardsPos.position[position].y }, 1000);
-  // //   GameField.stage.addChild(newCard);
-  // // };
 
   //選択したカードの合計を計算
   private calcNumbers = (): void => {
-    this.sumNumber = this.selectCard.reduce((total: number, num: Card) => total + +num.rank, 0);
+    this.sumNumber = this.selectCards.reduce((total: number, num: Card) => total + +num.rank, 0);
   };
 
-  // private makeArray = (): number[][] => {
-  //   let hartArr: number[] = [];
-  //   let diamondArr: number[] = [];
-  //   let cloverArr: number[] = [];
-  //   let spadeArr: number[] = [];
+  private changeFieldCardOpacity = (): void => {
+    for (const card of this.fieldCards) {
+      if (!this.checkNumberPattern()) {
+        card.isClicked = true;
+        card.cardImage.alpha = 0.5;
+      }
+    }
+  };
 
-  //   let subArr = [hartArr, diamondArr, cloverArr, spadeArr];
-  //   // let subArr = [Harr, Carr, Sarr, Darr];
-  //   for (const word of this.fieldCards) {
-  //     if (word.suit === 'H') hartArr.push(+word.rank);
-  //     if (word.suit === 'D') diamondArr.push(+word.rank);
-  //     if (word.suit === 'C') cloverArr.push(+word.rank);
-  //     if (word.suit === 'S') spadeArr.push(+word.rank);
-  //   }
+  private SuitArrays = (): number[][] => {
+    let hartArray: number[] = [];
+    let diamondArray: number[] = [];
+    let cloverArray: number[] = [];
+    let spadeArray: number[] = [];
 
-  //   // console.log('aaaaaaaa', subArr[0]);
-
-  //   return subArr;
-  // };
+    let suitArrays = [hartArray, diamondArray, cloverArray, spadeArray];
+    // let subArr = [Harr, Carr, Sarr, Darr];
+    for (const type of this.fieldCards) {
+      if (type.suit === 'H') hartArray.push(+type.rank);
+      if (type.suit === 'D') diamondArray.push(+type.rank);
+      if (type.suit === 'C') cloverArray.push(+type.rank);
+      if (type.suit === 'S') spadeArray.push(+type.rank);
+    }
+    return suitArrays;
+  };
 
   // [key: string]: number;
-  // private check = (): boolean => {
-  //   let subArr = this.makeArray();
-  //   console.log('aaaaaaa', subArr);
+  private checkNumberPattern = (): boolean => {
+    let suitArrays = this.SuitArrays();
+    // console.log('aaaaaaa', suitArrays);
 
-  //   for (let i = 0; i < subArr.length; i++) {
-  //     for (let j = 0; j < this.mainArr.length; j++) {
-  //       if (this.mainArr[j].every((ele) => subArr[i].includes(ele))) {
-  //         return true;
-  //       } else {
-  //         continue;
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // };
+    for (let i = 0; i < suitArrays.length; i++) {
+      for (let j = 0; j < this.mainArr.length; j++) {
+        if (this.mainArr[j].every((ele) => suitArrays[i].includes(ele))) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  private resetGame = () => {
+    GameField.stage.removeChild(this.deckDisplay);
+    for (const fieldCard of this.fieldCards) {
+      GameField.stage.removeChild(fieldCard.cardImage);
+      fieldCard.cardImage.removeAllEventListeners('click');
+      console.log('remove Event!!!!!!!!!!!!!!!!!!!!');
+    }
+    this.init();
+    this.fieldCards = [];
+    this.selectCards = [];
+    this.sumNumber = 0;
+    this.countAllCards = 0;
+  };
 
   //時間の表示
   private countTime(startTime: number) {

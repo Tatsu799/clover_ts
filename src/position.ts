@@ -1,5 +1,5 @@
 export class Position {
-  public position = [
+  public fieldPosition = [
     { x: 100, y: 10, pos: 0 },
     { x: 200, y: 10, pos: 1 },
     { x: 300, y: 10, pos: 2 },
