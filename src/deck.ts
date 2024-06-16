@@ -22,7 +22,7 @@ export class Deck {
 
   constructor() {
     this.cards = Deck.createDeck();
-    this.shuffleDeck();
+    // this.shuffleDeck();
   }
 
   public static createDeck(): Card[] {
