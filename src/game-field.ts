@@ -31,6 +31,7 @@ export class GameField {
     [3, 5, 7],
     [4, 5, 6],
     [1, 2, 4, 8],
+    [1, 2, 3, 9],
     [1, 2, 5, 7],
     [1, 3, 4, 7],
     [2, 3, 4, 6],
@@ -49,7 +50,10 @@ export class GameField {
     });
 
     stopBtn?.addEventListener('click', () => {
-      clearTimeout(this.setTimeId);
+      // clearTimeout(this.setTimeId);
+
+      console.log('???????? field', this.fieldCards);
+      console.log('??????? select', this.selectCards);
     });
   }
 
@@ -57,7 +61,10 @@ export class GameField {
     //タイマーの実行
     // const startTime = Date.now();
     // this.countTime(startTime);
-    this.lineUpCards();
+
+    // this.lineUpCards();
+
+    this.showFieldCards();
 
     createjs.Ticker.addEventListener('tick', handleTick);
     function handleTick() {
@@ -71,9 +78,8 @@ export class GameField {
     });
   };
 
-  //ゲーム開始時にカードを場にならべる
-  public lineUpCards() {
-    //ここはAnnimateの画像入れ替え
+  //開始時のフィールドに表示するカードを取得
+  private showFieldCards = async () => {
     let deck: Deck = new Deck();
     this.countAllCards = deck.cards.length;
 
@@ -82,11 +88,18 @@ export class GameField {
     this.deckDisplay.x = 380;
     this.deckDisplay.y = 380;
 
+    for (let i = this.fieldCards.length; i < 16; i++) {
+      await this.sleep(100);
+      await this.showCardImage(deck, i);
+    }
     //仮
     this.deckDisplay.addEventListener('click', () => console.log(this.showAllCardsCount(deck)));
 
-    this.getFirstFieldCards(deck);
-  }
+    this.clickEvent(deck);
+    await this.sleep(1000);
+    this.changeFieldCardOpacity();
+    console.log(this.checkNumberPattern());
+  };
 
   //カードの画像を表示
   private showCardImage = async (deck: Deck, fieldIndex: number) => {
@@ -110,18 +123,6 @@ export class GameField {
     console.log(this.countAllCards);
   };
 
-  //開始時のフィールドに表示するカードを取得
-  private getFirstFieldCards = async (deck: Deck) => {
-    for (let i = 0; i < 16; i++) {
-      await this.sleep(100);
-      await this.showCardImage(deck, i);
-    }
-    this.clickEvent(deck);
-    await this.sleep(1000);
-    this.changeFieldCardOpacity();
-    console.log(this.checkNumberPattern());
-  };
-
   //カードを消した時の処理
   private removeAndDrawCard = (deck: Deck, selectedCard: Card) => {
     if (deck.cards.length !== 0) {
@@ -129,33 +130,36 @@ export class GameField {
         .to({ scale: 0, regY: 0, regX: -50 }, 500)
         .call(() => this.removeCardFromField(selectedCard))
         .call(() => this.drawNewCards(deck, selectedCard));
-      console.log('none', deck);
-      console.log(this.fieldCards);
     } else {
-      console.log('deck is zero!!!!!!!!!2');
-      console.log(this.countAllCards);
       createjs.Tween.get(this.selectCards)
         .to({ scale: 0, regY: 0, regX: -50 }, 500)
-        .call(() => this.removeCardFromField(selectedCard))
-        .call(() => this.drawNewCards(deck, selectedCard));
+        .call(() => this.removeCardFromField(selectedCard));
+      // .call(() => this.drawNewCards(deck, selectedCard));
+
+      console.log('deck is zero!!!!!!!!!2');
+      console.log(this.countAllCards);
     }
   };
 
-  //フィールドにカードを追加する処理
+  //山札からカードをフィールドに追加する処理
   private addCardToField = (deck: Deck, fieldIndex: number): void => {
     const card = deck.cards.pop();
-    if (this.fieldCards.length !== 0) {
-      this.fieldCards.push(card!);
-      this.fieldCards[fieldIndex].currentPos = this.cardsPos.fieldPosition[fieldIndex].pos;
-    } else {
-      this.fieldCards.push(card!);
+    if (deck.cards.length > 0 && card !== undefined) {
+      this.fieldCards.push(card);
       this.fieldCards[fieldIndex].currentPos = this.cardsPos.fieldPosition[fieldIndex].pos;
     }
+    // if (this.fieldCards.length !== 0) {
+    //   this.fieldCards.push(card);
+    //   this.fieldCards[fieldIndex].currentPos = this.cardsPos.fieldPosition[fieldIndex].pos;
+    // } else {
+    //   this.fieldCards.push(card);
+    //   this.fieldCards[fieldIndex].currentPos = this.cardsPos.fieldPosition[fieldIndex].pos;
+    // }
   };
 
   //山札からフィールドに追加するカードを生成
   private drawNewCards = (deck: Deck, fieldCard: Card) => {
-    if (deck.cards.length !== 0) {
+    if (deck.cards.length > 0) {
       const cardIndex = deck.cards.length - 1;
       const newCard = new createjs.Text(`${deck.cards[cardIndex].suit}:${deck.cards[cardIndex].rank}`, '30px serif'); //
       deck.cards[cardIndex].cardImage = newCard;
@@ -169,6 +173,8 @@ export class GameField {
       );
       // deck.cards[cardIndex].cardImage.addEventListener('click', () => this.event(deck, deck.cards[cardIndex]));
       const card = deck.cards.pop();
+      console.log('card!!!!!!!!!!!!', card);
+
       if (card !== undefined) {
         card.cardImage.addEventListener('click', () => this.event(deck, card));
       }
@@ -188,7 +194,7 @@ export class GameField {
       const index = this.fieldCards.findIndex((ele) => ele === selectedCard);
       this.fieldCards.splice(index, 1);
     }
-    console.log('removed!!!!!', this.fieldCards);
+    console.log('removed!!!!!!!!!!', this.fieldCards);
   };
 
   //クリックイベントを設定
@@ -242,8 +248,8 @@ export class GameField {
 
       if (this.sumNumber === 36) {
         for (let i = 0; i < this.selectCards.length; i++) {
-          let card = this.selectCards[i];
-          this.removeAndDrawCard(deck, card);
+          let selectedCard = this.selectCards[i];
+          this.removeAndDrawCard(deck, selectedCard);
           this.clearAllOpacity(this.selectCards);
         }
         await this.sleep(1000);

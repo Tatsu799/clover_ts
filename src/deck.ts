@@ -22,7 +22,7 @@ export class Deck {
 
   constructor() {
     this.cards = Deck.createDeck();
-    this.shuffleDeck();
+    // this.shuffleDeck();
   }
 
   public static createDeck(): Card[] {
@@ -33,7 +33,7 @@ export class Deck {
     for (let i = 0; i < suitsLen; i++) {
       for (let j = 0; j < rankLen; j++) {
         // cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j, 0));
-        cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j));
+        cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], 0));
       }
     }
     return cards;
