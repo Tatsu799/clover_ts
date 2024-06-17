@@ -130,12 +130,14 @@ export class GameField {
         .to({ scale: 0, regY: 0, regX: -50 }, 500)
         .call(() => this.removeCardFromField(selectedCard))
         .call(() => this.drawNewCards(deck, selectedCard));
+      console.log('deck deck deck deck1', deck.cards);
     } else {
       createjs.Tween.get(this.selectCards)
         .to({ scale: 0, regY: 0, regX: -50 }, 500)
         .call(() => this.removeCardFromField(selectedCard));
       // .call(() => this.drawNewCards(deck, selectedCard));
 
+      console.log('deck deck deck deck2', deck.cards);
       console.log('deck is zero!!!!!!!!!2');
       console.log(this.countAllCards);
     }
@@ -159,7 +161,7 @@ export class GameField {
 
   //山札からフィールドに追加するカードを生成
   private drawNewCards = (deck: Deck, fieldCard: Card) => {
-    if (deck.cards.length > 0) {
+    if (deck.cards.length !== 0) {
       const cardIndex = deck.cards.length - 1;
       const newCard = new createjs.Text(`${deck.cards[cardIndex].suit}:${deck.cards[cardIndex].rank}`, '30px serif'); //
       deck.cards[cardIndex].cardImage = newCard;
