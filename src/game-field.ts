@@ -1,5 +1,6 @@
 import { Deck, Card } from './deck';
 import { Position } from './position';
+import { Timer } from './timer';
 
 export class GameField {
   ///必要
@@ -8,7 +9,12 @@ export class GameField {
   public deck: Deck = new Deck();
   public cardsPos: Position = new Position();
   public fieldCards: Card[] | null = []; //フィールドにあるカードを管理
-  public setTimeId: number = 0;
+
+  // public setTimeId: number = 0;
+  // public startTime: number = 0;
+  // public elapsedTime: number = 0;
+  public timer: Timer = new Timer();
+
   public selectCards: Card[] = [];
   public sumNumber: number = 0;
   public countAllCards: number = 0;
@@ -47,13 +53,14 @@ export class GameField {
       // this.countTime(startTime);
       // window.setTimeout(this.resetGame, 1000); ////
       // this.resetGame();
+      this.timer.switchTimer();
     });
 
     stopBtn?.addEventListener('click', () => {
+      this.timer.reset();
       // clearTimeout(this.setTimeId);
-
-      console.log('???????? field', this.fieldCards);
-      console.log('??????? select', this.selectCards);
+      // console.log('???????? field', this.fieldCards);
+      // console.log('??????? select', this.selectCards);
     });
   }
 
@@ -67,7 +74,7 @@ export class GameField {
 
     this.setImageToDeck();
     this.showCardsToField(); /////追加
-    this.keyDown(); /////////追加
+    // this.keyDown(); /////////追加
 
     createjs.Ticker.addEventListener('tick', handleTick);
     function handleTick() {
@@ -75,7 +82,7 @@ export class GameField {
     }
   }
 
-  private sleep = async (second: number) => {
+  public sleep = async (second: number) => {
     return new Promise((resolve) => {
       setTimeout(resolve, second);
     });
@@ -265,7 +272,7 @@ export class GameField {
   };
 
   //クリックのonoffを入れ替える
-  private changeClickState = (card: Card) => {
+  public changeClickState = (card: Card) => {
     if (this.checkNumberPattern()) {
       if (!card.isClicked) {
         card.isClicked = true;
@@ -278,7 +285,7 @@ export class GameField {
   };
 
   //clickStateをリセット
-  private resetClickState = (selectedCards: Card[]): void => {
+  public resetClickState = (selectedCards: Card[]): void => {
     selectedCards.forEach((card) => {
       card.isClicked = false;
       card.cardImage.alpha = 1;
@@ -346,7 +353,7 @@ export class GameField {
   };
 
   // [key: string]: number;
-  private checkNumberPattern = (): boolean => {
+  public checkNumberPattern = (): boolean => {
     let suitArrays = this.SuitArrays();
     // console.log('aaaaaaa', suitArrays);
 
@@ -371,25 +378,24 @@ export class GameField {
     // }
   };
 
-  private preventMove = (e: KeyboardEvent): void => {
-    e.preventDefault();
-  };
+  // private preventMove = (e: KeyboardEvent): void => {
+  //   e.preventDefault();
+  // };
 
-  private keyDown() {
-    window.addEventListener('keydown', this.preventMove);
-  }
+  // private keyDown() {
+  //   window.addEventListener('keydown', this.preventMove);
+  // }
 }
 
-//   private resetGame = () => {
-//     GameField.stage.removeChild(this.deckDisplay);
-//     for (const fieldCard of this.fieldCards) {
-//       GameField.stage.removeChild(fieldCard.cardImage);
-//       fieldCard.cardImage.removeAllEventListeners('click');
-//       console.log('remove Event!!!!!!!!!!!!!!!!!!!!');
-//     }
-//     this.init();
-//     this.fieldCards = [];
-//     this.selectCards = [];
-//     this.sumNumber = 0;
-//     this.countAllCards = 0;
-//   };
+// private resetGame = () => {
+//   GameField.stage.removeChild(this.deckDisplay);
+//   for (const fieldCard of this.fieldCards) {
+//    GameField.stage.removeChild(fieldCard.cardImage);
+//     fieldCard.cardImage.removeAllEventListeners('click');
+//   }
+//   this.fieldCards = [];
+//   this.selectCards = [];
+//   this.sumNumber = 0;
+//   this.countAllCards = 0;
+//   this.init();
+// };
