@@ -45,6 +45,8 @@ export class GameField {
   ];
 
   constructor() {
+    this.init();
+
     const startBtn = document.getElementById('start');
     const stopBtn = document.getElementById('stop');
 
