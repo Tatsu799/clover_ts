@@ -1,6 +1,7 @@
 import { Deck, Card } from './deck';
 import { Position } from './position';
 import { Timer } from './timer';
+import { checkNumberPattern } from './check-pattern';
 
 export class GameField {
   ///必要
@@ -8,41 +9,16 @@ export class GameField {
 
   public deck: Deck = new Deck();
   public cardsPos: Position = new Position();
-  public fieldCards: Card[] | null = []; //フィールドにあるカードを管理
-
-  // public setTimeId: number = 0;
-  // public startTime: number = 0;
-  // public elapsedTime: number = 0;
+  public fieldCards: Card[] = []; //フィールドにあるカードを管理
   public timer: Timer = new Timer();
 
   public selectCards: Card[] = [];
   public sumNumber: number = 0;
   public countAllCards: number = 0;
 
-  // public timer: string = '';
-
   //仮
   public deckDisplay = new createjs.Text('DECK', '20px serif');
-  public static stage = new createjs.Stage('canvas');
-  public mainArr: number[][] = [
-    [11, 12, 13],
-    [6, 9],
-    [7, 8],
-    [1, 5, 9],
-    [1, 6, 8],
-    [2, 4, 9],
-    [2, 5, 8],
-    [2, 6, 7],
-    [3, 4, 8],
-    [3, 5, 7],
-    [4, 5, 6],
-    [1, 2, 4, 8],
-    [1, 2, 3, 9],
-    [1, 2, 5, 7],
-    [1, 3, 4, 7],
-    [2, 3, 4, 6],
-    [1, 2, 3, 4, 5],
-  ];
+  static stage = new createjs.Stage('canvas');
 
   constructor() {
     this.init();
@@ -51,7 +27,6 @@ export class GameField {
     const stopBtn = document.getElementById('stop');
 
     startBtn?.addEventListener('click', () => {
-      // const startTime = Date.now();
       // this.countTime(startTime);
       // window.setTimeout(this.resetGame, 1000); ////
       // this.resetGame();
@@ -94,7 +69,7 @@ export class GameField {
     for (let i: number = 0; i < this.deck.cards.length; i++) {
       this.deck.cards[i].cardImage = new createjs.Text(`${this.deck.cards[i].suit}:${this.deck.cards[i].rank}`, '20px serif'); //
     }
-    this.fieldCards = new Array(16).fill(null);
+    this.fieldCards = new Array(16).fill(null); //
   };
 
   //カードを生成
@@ -132,7 +107,7 @@ export class GameField {
 
   //フィールドにカードを表示
   public showCardsToField = async () => {
-    for (let i: number = 0; i < this.fieldCards!.length; i++) {
+    for (let i: number = 0; i < this.fieldCards.length; i++) {
       console.log('aaaaaaaaaaaaaa', i);
       if (this.fieldCards![i] === null) {
         await this.getCardToField(i);
@@ -148,7 +123,7 @@ export class GameField {
     // console.log(this.checkNumberPattern());
   };
 
-  //カードを消した時の処理
+  //カードを消した時の処理 /////これはフィールドに移動しない
   private removeAndDrawCard = (selectedCard: Card) => {
     if (this.deck.cards.length !== 0) {
       createjs.Tween.get(this.selectCards)
@@ -242,7 +217,8 @@ export class GameField {
 
   //SelectCardリストに追加,Cardのステータスを変更、
   private addCardToSelectCard = (card: Card): void => {
-    if (this.checkNumberPattern()) {
+    // if (this.checkNumberPattern()) {
+    if (checkNumberPattern(this.fieldCards)) {
       if (!card.isClicked) {
         this.changeClickState(card);
         this.pushSelectCard(card);
@@ -275,7 +251,7 @@ export class GameField {
 
   //クリックのonoffを入れ替える
   public changeClickState = (card: Card) => {
-    if (this.checkNumberPattern()) {
+    if (checkNumberPattern(this.fieldCards)) {
       if (!card.isClicked) {
         card.isClicked = true;
         card.cardImage.alpha = 0.5;
@@ -292,11 +268,6 @@ export class GameField {
       card.isClicked = false;
       card.cardImage.alpha = 1;
     });
-
-    // for (const card of selectedCards) {
-    //   card.isClicked = false;
-    //   card.cardImage.alpha = 1;
-    // }
   };
 
   //選択したカードの合計を計算
@@ -304,22 +275,9 @@ export class GameField {
     this.sumNumber = this.selectCards.reduce((total: number, num: Card) => total + +num.rank, 0);
   };
 
-  // private changeFieldCardOpacity = (): void => {
-  //   for (const card of this.fieldCards!) {
-  //     if (!this.checkNumberPattern()) {
-  //       card.isClicked = true;
-  //       card.cardImage.alpha = 0.5;
-  //     }
-  //   }
-  // };
-
   private changeFieldCardOpacity = (): void => {
-    if (!this.checkNumberPattern()) {
+    if (!checkNumberPattern(this.fieldCards)) {
       if (this.fieldCards !== null) {
-        // for (const card of this.fieldCards!) {
-        //   card.isClicked = true;
-        //   card.cardImage.alpha = 0.5;
-        // }
         this.fieldCards.forEach((card) => {
           card.isClicked = true;
           card.cardImage.alpha = 0.5;
@@ -328,56 +286,10 @@ export class GameField {
     }
   };
 
-  private SuitArrays = (): number[][] => {
-    let hartArray: number[] = [];
-    let diamondArray: number[] = [];
-    let cloverArray: number[] = [];
-    let spadeArray: number[] = [];
-
-    let suitArrays = [hartArray, diamondArray, cloverArray, spadeArray];
-    // let subArr = [Harr, Carr, Sarr, Darr];
-    // for (const type of this.fieldCards!) {
-    //   if (type.suit === 'H') hartArray.push(+type.rank);
-    //   if (type.suit === 'D') diamondArray.push(+type.rank);
-    //   if (type.suit === 'C') cloverArray.push(+type.rank);
-    //   if (type.suit === 'S') spadeArray.push(+type.rank);
-    // }
-
-    if (this.fieldCards !== null) {
-      this.fieldCards.forEach((type) => {
-        if (type.suit === 'H') hartArray.push(+type.rank);
-        if (type.suit === 'D') diamondArray.push(+type.rank);
-        if (type.suit === 'C') cloverArray.push(+type.rank);
-        if (type.suit === 'S') spadeArray.push(+type.rank);
-      });
-    }
-    return suitArrays;
-  };
-
-  // [key: string]: number;
-  public checkNumberPattern = (): boolean => {
-    let suitArrays = this.SuitArrays();
-    // console.log('aaaaaaa', suitArrays);
-
-    for (let i = 0; i < suitArrays.length; i++) {
-      for (let j = 0; j < this.mainArr.length; j++) {
-        if (this.mainArr[j].every((ele) => suitArrays[i].includes(ele))) {
-          console.log(true);
-          return true;
-        }
-      }
-    }
-    console.log(false);
-    return false;
-  };
-
   private clearAllOpacity = (selectedCard: Card[]) => {
     selectedCard.forEach((card) => {
       card.cardImage.alpha = 1;
     });
-    // for (const card of selectedCard) {
-    //   card.cardImage.alpha = 1;
-    // }
   };
 
   // private preventMove = (e: KeyboardEvent): void => {
