@@ -15,30 +15,30 @@ export class Card {
 }
 
 export class Deck {
-  public static _SUITS = ['H', 'D', 'C', 'S'];
-  public static _RANKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13'];
+  private _SUITS = ['H', 'D', 'C', 'S'];
+  private _RANKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13'];
   public cards: Card[];
 
   constructor() {
-    this.cards = Deck.createDeck();
+    this.cards = this.createDeck();
     this.shuffleDeck();
   }
 
-  public static createDeck(): Card[] {
-    const suitsLen = Deck._SUITS.length; //4
-    const rankLen = Deck._RANKS.length; //12
+  private createDeck(): Card[] {
+    const suitsLen = this._SUITS.length; //4
+    const rankLen = this._RANKS.length; //12
     const cards: Card[] = [];
 
     for (let i = 0; i < suitsLen; i++) {
       for (let j = 0; j < rankLen; j++) {
         // cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], i * rankLen + j, 0));
-        cards.push(new Card(Deck._SUITS[i], Deck._RANKS[j], 0));
+        cards.push(new Card(this._SUITS[i], this._RANKS[j], 0));
       }
     }
     return cards;
   }
 
-  public shuffleDeck(): void {
+  private shuffleDeck(): void {
     let deckSize: number = this.cards.length; // 48
 
     for (let i = deckSize - 1; i >= 0; i--) {

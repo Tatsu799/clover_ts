@@ -7,14 +7,14 @@ export class GameField {
   ///必要
   //public container = new createjs.Container();
 
-  public deck: Deck = new Deck();
-  public cardsPos: Position = new Position();
-  public fieldCards: Card[] = []; //フィールドにあるカードを管理
-  public timer: Timer = new Timer();
+  private deck: Deck = new Deck();
+  private cardsPos: Position = new Position();
+  private fieldCards: Card[] = []; //フィールドにあるカードを管理
+  private timer: Timer = new Timer();
 
-  public selectCards: Card[] = [];
-  public sumNumber: number = 0;
-  public countAllCards: number = 0;
+  private selectCards: Card[] = [];
+  private sumNumber: number = 0;
+  private countAllCards: number = 0;
 
   //仮
   public deckDisplay = new createjs.Text('DECK', '20px serif');
@@ -59,13 +59,13 @@ export class GameField {
     }
   }
 
-  public sleep = async (second: number) => {
+  private sleep = async (second: number) => {
     return new Promise((resolve) => {
       setTimeout(resolve, second);
     });
   };
 
-  public setImageToDeck = async () => {
+  private setImageToDeck = async () => {
     for (let i: number = 0; i < this.deck.cards.length; i++) {
       this.deck.cards[i].cardImage = new createjs.Text(`${this.deck.cards[i].suit}:${this.deck.cards[i].rank}`, '20px serif'); //
     }
@@ -73,7 +73,7 @@ export class GameField {
   };
 
   //カードを生成
-  public getCardToField = async (fieldIndex: number): Promise<void> => {
+  private getCardToField = async (fieldIndex: number): Promise<void> => {
     await this.sleep(100);
     const deckIndex: number = this.deck.cards.length - 1;
     console.log(deckIndex);
@@ -106,7 +106,7 @@ export class GameField {
   };
 
   //フィールドにカードを表示
-  public showCardsToField = async () => {
+  private showCardsToField = async () => {
     for (let i: number = 0; i < this.fieldCards.length; i++) {
       console.log('aaaaaaaaaaaaaa', i);
       if (this.fieldCards![i] === null) {
@@ -160,7 +160,7 @@ export class GameField {
     fieldCard.cardImage.addEventListener('click', () => this.event(fieldCard));
   };
 
-  public event = async (fieldCard: Card): Promise<void> => {
+  private event = async (fieldCard: Card): Promise<void> => {
     console.log(fieldCard);
 
     if (
@@ -250,7 +250,7 @@ export class GameField {
   };
 
   //クリックのonoffを入れ替える
-  public changeClickState = (card: Card) => {
+  private changeClickState = (card: Card) => {
     if (checkNumberPattern(this.fieldCards)) {
       if (!card.isClicked) {
         card.isClicked = true;
@@ -263,7 +263,7 @@ export class GameField {
   };
 
   //clickStateをリセット
-  public resetClickState = (selectedCards: Card[]): void => {
+  private resetClickState = (selectedCards: Card[]): void => {
     selectedCards.forEach((card) => {
       card.isClicked = false;
       card.cardImage.alpha = 1;
