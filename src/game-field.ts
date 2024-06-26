@@ -20,6 +20,11 @@ export class GameField {
   public deckDisplay = new createjs.Text('DECK', '20px serif');
   static stage = new createjs.Stage('canvas');
 
+  private container = new createjs.Container();
+  private container2 = new createjs.Container();
+  private mask: createjs.Shape = new createjs.Shape();
+  // private mask2: createjs.Shape = new createjs.Shape();
+
   constructor() {
     this.init();
 
@@ -35,6 +40,46 @@ export class GameField {
 
     stopBtn?.addEventListener('click', () => {
       this.timer.reset();
+
+      const text = new createjs.Text('H8', '20px serif');
+      text.x = 150;
+      text.y = 100;
+      this.container.addChild(text);
+
+      const button = new createjs.Shape();
+      button.graphics.beginFill('transparent').drawRect(0, 0, 100, 50);
+      button.x = 150;
+      button.y = 100;
+      this.container.addChild(button);
+
+      // マスクの作成
+      const mask = new createjs.Shape();
+      mask.graphics.beginFill('black').drawRect(0, 0, 100, 50);
+      mask.x = button.x;
+      mask.y = button.y;
+
+      // 半透明のオーバーレイを作成
+      const overlay = new createjs.Shape();
+      overlay.graphics.beginFill('rgba(0, 0, 0, 0.8)').drawRect(0, 0, 500, 500);
+
+      const clear = new createjs.Shape();
+      clear.graphics.beginFill('rgba(0, 0, 0, 0)').drawRect(button.x, button.y, 100, 50);
+      overlay.mask = clear;
+
+      // マスクの部分を透明にする
+      // overlay.graphics.beginFill('rgba(0, 0, 0, 0)').drawRect(button.x, button.y, 100, 50);
+      this.container.addChild(overlay);
+
+      button.mask = this.mask;
+
+      const overlay2 = new createjs.Shape();
+      overlay2.graphics.beginFill('rgba(0, 0, 0, 0.8)').drawRect(0, 0, 500, 500);
+
+      this.container.addChild(overlay2);
+
+      // マスクの設定
+      // button.mask = mask;
+      // overlay.mask = mask;
       // clearTimeout(this.setTimeId);
       // console.log('???????? field', this.fieldCards);
       // console.log('??????? select', this.selectCards);
@@ -52,6 +97,8 @@ export class GameField {
     this.setImageToDeck();
     this.showCardsToField(); /////追加
     // this.keyDown(); /////////追加
+
+    GameField.stage.addChild(this.container);
 
     createjs.Ticker.addEventListener('tick', handleTick);
     function handleTick() {
@@ -99,7 +146,8 @@ export class GameField {
           this.fieldCards[fieldIndex] = card;
           this.fieldCards[fieldIndex].currentPos = this.cardsPos.fieldPosition[fieldIndex].pos;
           await this.sleep(100);
-          GameField.stage.addChild(card.cardImage);
+          // GameField.stage.addChild(card.cardImage);
+          this.container.addChild(card.cardImage);
         }
       }
     }
