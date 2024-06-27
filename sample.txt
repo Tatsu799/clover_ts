@@ -80,3 +80,90 @@ abstract class GenericAbstractList<E> {
     return this.initialList;
   }
 }
+
+
+
+
+最新
+////////////////////////////////////////
+
+
+class Nodes<E> {
+  data: E;
+  next: Nodes<E> = null;
+  constructor(data: E) {
+    this.data = data;
+  }
+}
+
+class Stack<E> {
+  head: Nodes<E>;
+  constructor() {
+    this.head = null;
+  }
+
+  public push(data: E): void {
+    const temp = this.head;
+    this.head = new Nodes<E>(data);
+    this.head.next = temp;
+  }
+
+  public pop(): E {
+    if (this.head === null) return null;
+    const temp = this.head;
+    this.head = this.head.next;
+
+    return temp.data;
+  }
+
+  public peek(): E {
+    if (this.head === null) return null;
+    return this.head.data;
+  }
+}
+
+const input = <HTMLInputElement>document.getElementById('input');
+const output = <HTMLParagraphElement>document.getElementById('output');
+const getButton = <HTMLButtonElement>document.getElementById('getButton');
+const backButton = <HTMLButtonElement>document.getElementById('backButton');
+const stack = new Stack<string>();
+
+getButton.addEventListener('click', () => {
+  stack.push(output.textContent);
+
+  let inputText = input.value;
+  stack.push(inputText);
+  console.log(stack);
+
+  output.textContent = inputText;
+  input.value = '';
+});
+
+backButton.addEventListener('click', () => {
+  output.textContent = stack.pop();
+});
+
+
+html /////////////
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>title</title>
+    <!-- <link rel="stylesheet" href="./css/style.css" /> -->
+    <script type="module" src="./dist/bundle.js"></script>
+  </head>
+  <body>
+    <h2>勉強用</h2>
+    <form action="#" id="form">
+      <input type="text" name="text" id="input" />
+      <button type="button" id="getButton">送信</button>
+      <button type="button" id="backButton">戻る</button>
+    </form>
+    <h3>ここに表示される</h3>
+    <p id="output">ここに文字</p>
+  </body>
+</html>
