@@ -1,3 +1,11 @@
+class Nodes<E> {
+  data: E;
+  next: Nodes<E> = null;
+  constructor(data: E) {
+    this.data = data;
+  }
+}
+
 class Stack<E> {
   // head: Nodes<E>;
   array: E[];
@@ -38,8 +46,6 @@ const backButton = <HTMLButtonElement>document.getElementById('backButton');
 const stack = new Stack<string>();
 
 getButton.addEventListener('click', () => {
-  stack.push(output.textContent);
-
   let inputText = input.value;
   stack.push(inputText);
   console.log(stack);
@@ -54,3 +60,49 @@ backButton.addEventListener('click', () => {
   const outputText = stack.pop();
   output.textContent = outputText;
 });
+
+// const state1 = [
+//   { suit: 'H', num: 12 },
+//   { suit: 'C', num: 5 },
+// ];
+
+// const state2 = [
+//   { suit: 'C', num: 10 },
+//   { suit: 'C', num: 5 },
+// ];
+
+// const a = [
+//   { name: 'aaa', age: 12 },
+//   { name: 'bbb', age: 33 },
+// ];
+
+// const b = [
+//   { name: 'ccc', age: 12 },
+//   { name: 'ddd', age: 33 },
+// ];
+// const stack = new Stack<{ suit: string; num: number }[]>();
+// stack.push(a);
+// stack.push(b);
+// console.log(stack);
+
+// abstract class GenericAbstractList<E> {
+//   private initialList: E[];
+
+//   constructor(arr: E[]) {
+//     this.initialList = arr;
+//   }
+
+//   public getOriginalList() {
+//     return this.initialList;
+//   }
+// }
+
+/*  
+スタックとは？
+・データを一時的に蓄えておくようなデータ構造の一つです。
+イメージとしては、お皿や本などを重ねていくイメージをするとわかりやすいかも。
+一枚ずつ積み重ねていき、一番新しいものから取り出すと言う動きをするもの。
+
+
+どのように使うのか？
+・今回は、追加したデータを保存していき、前の状態に戻したい時に戻すと言うように使いました。
